@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ grade.number }} класс — материалы по русскому языку · {{ site.name }}{% endblock %}
+{% block description %}{{ grade.description }}{% endblock %}
+{% block content %}
+<section class="grade-hero gridbg">
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Навигационная цепочка">
+      <a href="{{ base }}/">Главная</a><span aria-hidden="true">/</span><span aria-current="page">{{ grade.number }} класс</span>
+    </nav>
+    <div class="grade-head">
+      <div class="grade-head-main">
+        <div class="grade-title"><h1>{{ grade.number }} класс</h1>{% if grade.exam %}<span class="badge">{{ grade.exam }}</span>{% endif %}</div>
+        <p class="grade-intro">{{ grade.intro or grade.description }}</p>
+      </div>
+      <nav class="switcher" aria-label="Другие классы">
+        {% for g in grades %}<a href="{{ base }}/klass/{{ g.number }}/"{% if g.number == grade.number %} aria-current="page"{% endif %}>{{ g.number }}</a>{% endfor %}
+      </nav>
+    </div>
+  </div>
+</section>
+
+{% if grade.total %}
+<section class="wrap toolbar-wrap">
+  <div class="toolbar">
+    <div class="search">
+      <label class="visually-hidden" for="search">Поиск по материалам</label>
+      {{ icons.search() }}
+      <input id="search" type="search" placeholder="Поиск по темам" autocomplete="off">
+    </div>
+    <div class="chips" role="group" aria-label="Тип материала">
+      <button class="chip" type="button" data-kind-filter="all" aria-pressed="true">Все</button>
+      <button class="chip" type="button" data-kind-filter="theory" aria-pressed="false">Теория</button>
+      <button class="chip" type="button" data-kind-filter="practice" aria-pressed="false">Упражнения</button>
+    </div>
+  </div>
+  <p class="count" data-count aria-live="polite">Показано: {{ grade.total }} {{ grade.total|plural("материал,материала,материалов") }}</p>
+</section>
+
+<div class="wrap topics" data-materials>
+  {% for topic in grade.topics %}
+    <section class="topic" data-topic>
+      <h2>{{ topic.title }}</h2>
+      <ul class="list">
+        {% for m in topic.materials %}
+          <li class="item{% if loop.first %} first-visible{% endif %}" data-item data-kind="{{ m.kind }}" data-search="{{ m.title }} {{ m.note }} {{ topic.title }}">
+            <span class="item-icon">{{ icons.pencil() if m.kind == "practice" else icons.doc() }}</span>
+            <div class="item-main">
+              <div class="item-title">{{ m.title }}</div>
+              {% if m.note %}<div class="item-note">{{ m.note }}</div>{% endif %}
+            </div>
+            <span class="tag">{{ m.kind_label }} · {{ m.format_label }}{% if m.is_file %} · {{ m.size_label }}{% endif %}</span>
+            {% if m.is_file %}
+              <a class="item-btn" href="{{ m.href }}" download="{{ m.download_name }}">{{ icons.download() }}Скачать</a>
+            {% else %}
+              <a class="item-btn" href="{{ m.href }}" target="_blank" rel="noopener">{{ icons.external() }}Открыть</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endfor %}
+  <div class="empty" data-empty hidden>Ничего не нашлось. Попробуйте другой запрос или выберите «Все».</div>
+</div>
+{% else %}
+<div class="wrap" style="padding-top: 40px; padding-bottom: 56px">
+  <div class="empty">Материалы для {{ grade.number }} класса скоро появятся.</div>
+</div>
+{% endif %}
+
+<div class="wrap">
+  <section class="panel-cta">
+    <div>
+      <h2>Сложная тема? Разберём на занятии</h2>
+      <p>Пробное занятие — 30 минут, онлайн.</p>
+    </div>
+    <a class="btn btn-light" href="{{ base }}/#contacts">Записаться</a>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ base }}/static/js/filter.js" defer></script>{% endblock %}

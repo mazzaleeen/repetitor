@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero gridbg">
+  <div class="wrap">
+    <div class="hero-main">
+      <p class="eyebrow">{{ site.badge }}</p>
+      <h1>{{ site.title }}</h1>
+      <p class="lead">{{ site.text }}</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#classes">Выбрать класс {{ icons.arrow() }}</a>
+        <a class="btn btn-ghost" href="#contacts">Записаться на пробное</a>
+      </div>
+    </div>
+    <div class="info-card">
+      <h2>Как проходят занятия</h2>
+      <ul class="info-list">
+        <li><span class="icon-box">{{ icons.video() }}</span>
+          <div><div class="info-title">{{ site.lessons.format }}</div><div class="info-note">{{ site.lessons.format_note }}</div></div></li>
+        <li><span class="icon-box">{{ icons.clock() }}</span>
+          <div><div class="info-title">Пробное занятие — 30 минут</div><div class="info-note">{{ site.lessons.trial_price }}</div></div></li>
+        <li><span class="icon-box">{{ icons.book() }}</span>
+          <div><div class="info-title">Обычное занятие — 60 минут</div><div class="info-note">{{ site.lessons.regular_price }}</div></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="classes" class="section wrap">
+  <h2 class="section-title">Выберите класс</h2>
+  <p class="section-lead">Внутри — теория и упражнения по темам. Файлы можно открыть или скачать.</p>
+  <div class="grades">
+    {% for g in grades %}
+      <a class="grade-card" href="{{ base }}/klass/{{ g.number }}/">
+        <span class="grade-top"><span class="num">{{ g.number }}</span>{% if g.exam %}<span class="badge">{{ g.exam }}</span>{% endif %}</span>
+        <span class="grade-label">класс</span>
+        <span class="grade-desc">{{ g.description }}</span>
+        <span class="more">Материалы {{ icons.arrow(16) }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+{% set c = site.contacts %}
+<section id="contacts" class="cta">
+  <div class="wrap">
+    <div class="cta-text">
+      <h2>{{ c.title }}</h2>
+      <p>{{ c.text }}</p>
+    </div>
+    <div class="actions">
+      {% if c.telegram %}<a class="btn btn-light" href="https://t.me/{{ c.telegram }}" rel="noopener">{{ icons.send() }}Telegram</a>{% endif %}
+      {% if c.phone %}<a class="btn {{ 'btn-outline-light' if c.telegram else 'btn-light' }}" href="{{ c.phone_href }}">{{ icons.phone() }}{{ c.phone }}</a>{% endif %}
+      {% if not c.telegram and not c.phone %}<span class="btn btn-outline-light">[Укажите Telegram или телефон в настройки.toml]</span>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
