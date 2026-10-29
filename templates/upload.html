@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block head %}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src https://api.github.com; form-action 'none'; base-uri 'none'">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+{% endblock %}
+{% block title %}Загрузка материалов · {{ site.name }}{% endblock %}
+{% block content %}
+<section class="section wrap upload" id="uploader"
+         data-repo="{{ repo }}" data-branch="{{ branch }}" data-site="{{ base }}"
+         data-grades="{{ grade_numbers }}" data-allowed="{{ allowed }}">
+  <h1 class="section-title">Загрузка материалов</h1>
+  <p class="section-lead">Служебная страница для репетитора. Добавленные файлы появляются на сайте через 1–2 минуты.</p>
+
+  {% if not repo %}
+  <p class="msg msg-err">Страница не настроена: при сборке сайта не указан репозиторий GitHub.</p>
+  {% endif %}
+
+  <div class="card" id="login-card">
+    <h2>Вход</h2>
+    <form id="login-form" class="form">
+      <div class="field">
+        <label for="token">Ключ доступа GitHub</label>
+        <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+      </div>
+      <label class="check"><input id="remember" type="checkbox" checked> Запомнить на этом устройстве</label>
+      <div><button class="btn btn-primary" id="login-btn" type="submit">Войти</button></div>
+      <p class="msg" id="login-msg" role="status" hidden></p>
+    </form>
+    <details class="help">
+      <summary>Где взять ключ — один раз, около 5 минут</summary>
+      <ol>
+        <li>Войдите на github.com в аккаунт <b>{{ repo.split('/')[0] if repo else 'владельца репозитория' }}</b> — ключ создаёт владелец репозитория.</li>
+        <li>Откройте <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>
+          (или: фото профиля → Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token).</li>
+        <li><b>Token name</b> — например, «Сайт репетитора». <b>Expiration</b> — на год; когда срок выйдет, создайте новый ключ так же.</li>
+        <li><b>Repository access</b> → <b>Only select repositories</b> → выберите <b>{{ repo.split('/')[1] if repo else 'репозиторий сайта' }}</b>.</li>
+        <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b> → <b>Read and write</b>. Остальное не трогайте.</li>
+        <li>Нажмите <b>Generate token</b>, скопируйте ключ (начинается с <code>github_pat_</code>) и вставьте его выше. GitHub показывает ключ только один раз.</li>
+      </ol>
+      <p>Ключ хранится только в этом браузере и никуда, кроме GitHub, не отправляется. Если телефон или компьютер потерян — удалите ключ на той же странице GitHub, и он перестанет работать.</p>
+    </details>
+  </div>
+
+  <div class="card session" id="session-card" hidden>
+    <span>Вход выполнен</span>
+    <button id="logout" class="btn btn-ghost btn-sm" type="button">Выйти</button>
+  </div>
+
+  <div class="card" id="add-card" hidden>
+    <h2>Добавить материал</h2>
+    <form id="add-form" class="form" novalidate>
+      <div class="grid2">
+        <div class="field"><label for="grade">Класс</label><select id="grade"></select></div>
+        <div class="field"><label for="topic">Тема</label><select id="topic"></select></div>
+      </div>
+      <div class="field" id="new-topic-field" hidden>
+        <label for="new-topic">Название новой темы</label>
+        <input id="new-topic" type="text" maxlength="100" placeholder="Например, Орфография">
+      </div>
+
+      <fieldset class="field">
+        <legend>Тип</legend>
+        <div class="chips">
+          <label class="chip-radio"><input type="radio" name="kind" value="theory" checked><span>Теория</span></label>
+          <label class="chip-radio"><input type="radio" name="kind" value="practice"><span>Упражнения</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Что добавляем</legend>
+        <div class="chips">
+          <label class="chip-radio"><input type="radio" name="mode" value="file" checked><span>Файл</span></label>
+          <label class="chip-radio"><input type="radio" name="mode" value="link"><span>Ссылку</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field" id="file-field">
+        <label for="file">Файл</label>
+        <input id="file" type="file" multiple accept="{{ accept }}">
+        <p class="hint">До 25 МБ: PDF, Word, PowerPoint, Excel, картинки, аудио, видео. Можно выбрать несколько файлов сразу.</p>
+      </div>
+      <div class="field" id="url-field" hidden>
+        <label for="url">Ссылка</label>
+        <input id="url" type="url" placeholder="https://…">
+        <p class="hint">Например, на видео или папку на Яндекс Диске.</p>
+      </div>
+
+      <div id="single-fields">
+        <div class="field">
+          <label for="title">Название на сайте</label>
+          <input id="title" type="text" maxlength="150" placeholder="Например, Н и НН в разных частях речи">
+        </div>
+        <div class="field">
+          <label for="note">Короткое описание <span class="muted">— необязательно</span></label>
+          <input id="note" type="text" maxlength="200" placeholder="Например, правила с примерами и исключениями">
+        </div>
+      </div>
+      <p class="hint" id="multi-hint" hidden>Выбрано несколько файлов — названия на сайте возьмутся из имён файлов.</p>
+
+      <div><button class="btn btn-primary" id="submit" type="submit">Загрузить</button></div>
+      <p class="msg" id="add-msg" role="status" hidden></p>
+    </form>
+  </div>
+
+  <div class="card" id="list-card" hidden>
+    <h2 id="list-title">Материалы в теме</h2>
+    <ul class="list" id="list"></ul>
+    <p class="muted" id="list-empty" hidden>В этой теме пока ничего нет.</p>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ base }}/static/js/upload.js" defer></script>{% endblock %}

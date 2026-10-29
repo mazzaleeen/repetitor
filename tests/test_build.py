@@ -91,6 +91,16 @@ class BuildTests(unittest.TestCase):
         css = (self.out / "static/css/site.css").read_text()
         self.assertNotIn("http", css)
 
+    def test_upload_page(self):
+        html = self.page("upload/index.html")
+        self.assertIn('name="robots" content="noindex', html)
+        self.assertIn("connect-src https://api.github.com", html)
+        self.assertIn('data-grades="[6, 7, 8, 9, 10, 11]"', html)
+        self.assertIn('/russkiy/static/js/upload.js', html)
+        self.assertTrue((self.out / "static/js/upload.js").exists())
+        for p in ["index.html", "klass/9/index.html"]:
+            self.assertNotIn("upload", self.page(p), p)
+
     def test_text_is_escaped(self):
         self.assertEqual(build.split_kind("Упражнения — <b>x</b>")[2], "<b>x</b>")
         self.assertEqual(build.split_order("12. Тема"), (12, "Тема"))

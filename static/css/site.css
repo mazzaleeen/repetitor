@@ -191,3 +191,39 @@ svg { flex: none; }
   .switcher a { width: 46px; height: 46px; font-size: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .grade-card { transition: none; } }
+
+/* Страница загрузки */
+.upload .card { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 28px; margin-bottom: 20px; max-width: 820px; }
+.upload .card h2 { margin-bottom: 18px; font: 500 22px/1.3 var(--display); }
+.upload .session { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 28px; }
+.form { display: flex; flex-direction: column; gap: 18px; }
+.field { margin: 0; padding: 0; border: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.field label, .field legend { font-weight: 700; font-size: 15px; padding: 0; }
+.field input[type=text], .field input[type=url], .field input[type=password], .field select {
+  width: 100%; min-height: 48px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line-strong);
+  background: var(--surface); color: var(--ink); font: 500 15px var(--body); }
+.field input[type=file] { font: 500 15px var(--body); padding: 10px 0; }
+.field input:focus, .field select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+.check { display: flex; gap: 10px; align-items: center; font-size: 15px; }
+.check input { width: 18px; height: 18px; }
+.chip-radio { position: relative; }
+.chip-radio input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip-radio span { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 12px;
+  border: 1.5px solid var(--line-strong); background: var(--surface); font-weight: 700; font-size: 14px; cursor: pointer; }
+.chip-radio input:checked + span { background: var(--accent); border-color: var(--accent); color: #FFFFFF; }
+.chip-radio input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hint, .muted { margin: 0; font-size: 14px; color: var(--muted); font-weight: 400; }
+.msg { margin: 0; padding: 12px 16px; border-radius: 12px; font-size: 15px; }
+.msg-ok { background: #E4F3EA; color: #1E6B42; }
+.msg-err { background: #FBE6E4; color: #A3261E; }
+.msg-info { background: var(--accent-soft); color: var(--accent-dark); }
+.msg a { color: inherit; font-weight: 700; }
+.help { margin-top: 20px; font-size: 15px; color: var(--text-2); }
+.help summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+.help ol { padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.help code { background: var(--ground); padding: 1px 6px; border-radius: 6px; }
+.upload .list .item-btn { cursor: pointer; background: var(--surface); font: 700 14px var(--body); }
+.upload .list .item-btn:disabled { opacity: .6; cursor: default; }
+button:disabled { opacity: .7; cursor: default; }
+#single-fields { display: flex; flex-direction: column; gap: 18px; }

@@ -5,6 +5,8 @@
 На GitHub сборка запускается сама после каждого изменения (.github/workflows/deploy.yml).
 """
 import argparse
+import json
+import os
 import re
 import shutil
 import sys
@@ -193,7 +195,7 @@ def load_settings():
     return site, grades
 
 
-def build(base: str = "", out: Path = OUT, materials: Path = MATERIALS):
+def build(base: str = "", out: Path = OUT, materials: Path = MATERIALS, repo: str = ""):
     warnings.clear()
     base = base.rstrip("/")
     site, grade_rows = load_settings()
@@ -225,6 +227,9 @@ def build(base: str = "", out: Path = OUT, materials: Path = MATERIALS):
     for g in grades:
         render("grade.html", f"klass/{g.number}/index.html", grade=g)
     render("404.html", "404.html")
+    render("upload.html", "upload/index.html", repo=repo, branch="main",
+           grade_numbers=json.dumps([g.number for g in grades]),
+           allowed=",".join(sorted(ALLOWED)), accept=",".join("." + e for e in sorted(ALLOWED)))
 
     total = sum(g.total for g in grades)
     print(f"Готово: {len(grades)} классов, {total} материалов → {out}")
@@ -234,5 +239,7 @@ def build(base: str = "", out: Path = OUT, materials: Path = MATERIALS):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-path", default="", help="Путь сайта, например /russkiy (GitHub подставляет сам).")
+    parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", ""),
+                        help="Репозиторий для страницы загрузки, например mazzaleeen/repetitor (на GitHub берётся сам).")
     args = parser.parse_args()
-    build(args.base_path)
+    build(args.base_path, repo=args.repo)
