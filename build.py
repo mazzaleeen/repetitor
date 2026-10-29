@@ -187,11 +187,7 @@ def collect_topics(grade_dir: Path, number: int, files_out: Path, base: str):
 def load_settings():
     with SETTINGS.open("rb") as fh:
         data = tomllib.load(fh)
-    site = {**data.get("site", {}), "lessons": data.get("lessons", {}), "contacts": data.get("contacts", {})}
-    contacts = site["contacts"]
-    digits = "".join(ch for ch in contacts.get("phone", "") if ch.isdigit() or ch == "+")
-    contacts["phone_href"] = f"tel:{digits}" if digits else ""
-    contacts["telegram"] = contacts.get("telegram", "").strip().lstrip("@")
+    site = data.get("site", {})
     grades = [g for g in data.get("grade", []) if g.get("show", True)]
     grades.sort(key=lambda g: g["number"])
     return site, grades
@@ -228,7 +224,6 @@ def build(base: str = "", out: Path = OUT, materials: Path = MATERIALS):
     render("home.html", "index.html")
     for g in grades:
         render("grade.html", f"klass/{g.number}/index.html", grade=g)
-    render("privacy.html", "privacy/index.html")
     render("404.html", "404.html")
 
     total = sum(g.total for g in grades)

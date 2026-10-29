@@ -32,7 +32,7 @@ class BuildTests(unittest.TestCase):
         for n in range(6, 12):
             self.assertTrue((self.out / f"klass/{n}/index.html").exists())
             self.assertIn(f'href="/russkiy/klass/{n}/"', self.page("index.html"))
-        for p in ["index.html", "privacy/index.html", "404.html", "static/css/site.css", "static/js/filter.js"]:
+        for p in ["index.html", "404.html", "static/css/site.css", "static/js/filter.js", "static/favicon.svg"]:
             self.assertTrue((self.out / p).exists(), p)
 
     def test_topics_order_titles_and_kinds(self):
@@ -68,11 +68,24 @@ class BuildTests(unittest.TestCase):
         self.assertIn('download="Н и НН в разных частях речи.pdf"', html)
         self.assertIn("Показано: 8 материалов", html)
 
-    def test_empty_grade(self):
-        self.assertIn("скоро появятся", self.page("klass/7/index.html"))
+    def test_empty_grade_still_has_search_and_filters(self):
+        html = self.page("klass/7/index.html")
+        self.assertIn("скоро появятся", html)
+        self.assertIn('id="search"', html)
+        self.assertIn('data-kind-filter="theory"', html)
+        self.assertIn('data-kind-filter="practice"', html)
+
+    def test_only_materials_no_booking_or_footer(self):
+        for p in ["index.html", "klass/9/index.html", "klass/7/index.html"]:
+            html = self.page(p)
+            for word in ["Записаться", "<footer", "Telegram", "t.me/", "tel:", "privacy", "₽"]:
+                self.assertNotIn(word, html, f"{p}: {word}")
+        home = self.page("index.html")
+        self.assertIn("Выберите класс", home)
+        self.assertEqual(home.count('class="grade-card"'), 6)
 
     def test_nothing_external(self):
-        for p in ["index.html", "klass/9/index.html", "privacy/index.html", "404.html"]:
+        for p in ["index.html", "klass/9/index.html", "404.html"]:
             html = self.page(p)
             self.assertIsNone(re.search(r'<(script|link|img)[^>]+(src|href)="https?://', html), p)
         css = (self.out / "static/css/site.css").read_text()

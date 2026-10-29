@@ -36,7 +36,7 @@
       total += visible;
     });
     if (count) count.textContent = "Показано: " + total + " " + plural(total, "материал", "материала", "материалов");
-    if (empty) empty.hidden = total !== 0;
+    if (empty) empty.hidden = total !== 0 || topics.length === 0;
   }
 
   chips.forEach(function (chip) {

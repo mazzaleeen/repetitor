@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ site.name }} — {{ site.role|lower }}{% endblock %}</title>
-  <meta name="description" content="{% block description %}{{ site.text }}{% endblock %}">
+  <meta name="description" content="{% block description %}{{ site.subheading }}{% endblock %}">
   <link rel="preload" href="{{ base }}/static/fonts/manrope-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="{{ base }}/static/fonts/unbounded-cyrillic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="icon" href="{{ base }}/static/favicon.svg" type="image/svg+xml">
@@ -20,24 +20,12 @@
       <span class="logo" aria-hidden="true">Аа</span>
       <span class="brand-text"><span class="brand-name">{{ site.name }}</span><span class="brand-role">{{ site.role }}</span></span>
     </a>
-    <nav class="nav" aria-label="Разделы">
-      <a href="{{ base }}/#classes">Классы</a>
-      <a href="{{ base }}/#contacts">Контакты</a>
-    </nav>
-    <a class="btn btn-primary btn-sm" href="{{ base }}/#contacts">Записаться</a>
   </div>
 </header>
 
 <main>
 {% block content %}{% endblock %}
 </main>
-
-<footer class="footer">
-  <div class="wrap">
-    <span>© {{ year }} {{ site.name }}, {{ site.role|lower }}</span>
-    <a href="{{ base }}/privacy/">Конфиденциальность</a>
-  </div>
-</footer>
 {% block scripts %}{% endblock %}
 </body>
 </html>
